@@ -13,7 +13,7 @@ import time
 import random
 
 
-class  Portscanner:
+class Portscanner:
     '''
     Represents a Portscanner providing Connect- and SYN-Scan methods
     '''
@@ -34,7 +34,7 @@ class  Portscanner:
         for port in self.port_range:
             try:
                 sock = socket.socket()
-                sock.settimeout(2) # avoid blocking due to closed ports
+                sock.settimeout(2)  # avoid blocking due to closed ports
                 sock.connect((self.remote_ip, port))
                 sock.close()
                 self.open_ports.add(port)
@@ -51,7 +51,7 @@ class  Portscanner:
     def syn_scan(self):
         self.operating = True
 
-        #create a raw socket
+        # create a raw socket
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
             s.settimeout(2)
@@ -68,7 +68,7 @@ class  Portscanner:
             packet = self.create_syn_packet(port)
             s.sendto(packet, (self.remote_ip, port))
 
-        time.sleep(3) # wait for last incomming packets
+        time.sleep(3)# wait for last incomming packets
         self.operating = False
         s.close()
         self.print_results()
@@ -77,7 +77,7 @@ class  Portscanner:
         dev = pcapy.findalldevs()[0]
 
         p = pcapy.open_live(dev, 1600, 0, 100)
-        p.setfilter('src host {0}'.format(self.remote_ip)) # Only packets with set SYN-ACK flag received
+        p.setfilter('src host {0}'.format(self.remote_ip))  # Only packets with set SYN-ACK flag received
         try:
             while self.operating:
                 p.dispatch(1, self.check_ack)
@@ -100,7 +100,7 @@ class  Portscanner:
                 self.open_ports.add(parsed_data[3])
 
     def parse_packet(self, packet):
-        data = ['src_ip', 'syn-flag', 'ack-flag', 'port']
+        data = ['src_ip', 'syn', 'ack', 'port']
 
         header_length = ord(packet[0]) & 0x0f
 
@@ -123,11 +123,11 @@ class  Portscanner:
         s = 0
         # loop taking 2 characters at a time
         for i in range(0, len(msg), 2):
-            w = ord(msg[i]) + (ord(msg[i+1]) << 8 )
+            w = ord(msg[i]) + (ord(msg[i+1]) << 8)
             s = s + w
 
-        s = (s>>16) + (s & 0xffff)
-        s = s + (s >> 16);
+        s = (s >> 16) + (s & 0xffff)
+        s = s + (s >> 16)
         s = ~s & 0xffff
 
         return s
@@ -151,7 +151,7 @@ class  Portscanner:
     def create_syn_packet(self, port):
 
         # tcp header fields
-        src_port = random.randint(20000, 65535) # create random port
+        src_port = random.randint(20000, 65535)  # create random port
         dest_port = port
         seq_nr = 454
         ack_nr = 0
@@ -175,7 +175,7 @@ class  Portscanner:
         # build a pseudo header to calculate the checksum
         tcp_header = pack('!HHLLBBHHH', src_port, dest_port, seq_nr, ack_nr, packet_offset,
                           flags,  window, checksum, urg_pointer)
-s        psh_source = socket.inet_aton(self.get_ip_address())
+        psh_source = socket.inet_aton(self.get_ip_address())
         psh_dest = socket.inet_aton(self.remote_ip)
         psh_placeholder = 0
         psh_protocol = socket.IPPROTO_TCP
@@ -216,7 +216,7 @@ if __name__ == "__main__":
     else:
         port_range = [int(sys.argv[3])]
 
-     # check if port numbers are in port range
+    # check if port numbers are in port range
     for port in port_range:
         if port < 0 or port > 65535:
             raise Exception('port number out of range', port)

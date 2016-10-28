@@ -1,9 +1,15 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 #
 # Requirements: pcapy
 # running on Mac OS 10.11
 # python 3.4.3
 #
 
+
+# -------------------------------------------------------------------------------------------------
+#                           Imports
+# -------------------------------------------------------------------------------------------------
 import sys
 import socket
 import thread
@@ -12,6 +18,10 @@ import pcapy
 import time
 import random
 
+
+# -------------------------------------------------------------------------------------------------
+#                           Scan Logic
+# -------------------------------------------------------------------------------------------------
 
 class Portscanner:
     '''
@@ -194,11 +204,16 @@ class Portscanner:
 
         return tcp_header
 
+# -------------------------------------------------------------------------------------------------
+#                       Parameter parsing
+# -------------------------------------------------------------------------------------------------
+
 
 if __name__ == "__main__":
 
-    if sys.argv.__len__() != 4:
-        print("Usage: scanner.py IP SCAN_METHOD LIST_OF_PORTS")
+    if sys.argv.__len__() != 4 or sys.argv[1] in ['-h', '--help']:
+        print("Usage: scanner.py IP SCAN_METHOD{SYN, CONNECT} LIST_OF_PORTS{1-1000,2190}")
+        sys.exit(-1)
     if sys.argv[2] in ['SYN', 'CONNECT']:
         method = sys.argv[2]
     else:
